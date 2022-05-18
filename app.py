@@ -1,17 +1,17 @@
 from flask import Flask, request, jsonify
 from flask_sqlalchemy import SQLAlchemy
-from flask_marshmallow import Marhsmallow
+from flask_marshmallow import Marshmallow
 import os
 
 
 app = Flask(__name__)
 basedir = os.path.abspath(os.path.dirname(__file__))
 db = SQLAlchemy(app)
-ma = Marhsmallow(app)
+ma = Marshmallow(app)
 
-spp.config["SQLALCHEMY_DATABASE_URI"] = 'sqlite:///' + os.path.join(basedir, 'app.sqlite')
+app.config["SQLALCHEMY_DATABASE_URI"] = 'sqlite:///' + os.path.join(basedir, 'app.sqlite')
 
-class Book(db.model):
+class Book(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     title = db.Column(db.String, nullable=False, unique=True)
     author = db.Column(db.String, nullable=False)
@@ -59,3 +59,12 @@ def add_book():
     db.session.commit()
     
     return jsonify("You've added a new book!")
+
+@app.route('/book/get', methods=["GET"])
+def get_books():
+    books = db.session.query(Book).all()
+    return jsonify(multiple_book_schema.dump(books))
+
+if __name__ == "__main__":
+    app.run(debug=True)
+
